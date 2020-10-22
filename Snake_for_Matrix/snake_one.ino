@@ -35,8 +35,10 @@ int dir = RIGHT;
 class snake {
     int head_x, head_y;
     int len;            //length of tail, without head
-    int tail [16]       //TODO: add max_length which is given in constructor and is used instead of hard coded 16
+    int tail [16];       //TODO: add max_length which is given in constructor and is used instead of hard coded 16
     int dir;
+    head_color = [0, 60, 255];
+    tail_color = [150, 20, 255];
 
 public:
     snake(int x, int y, int start_len){
@@ -44,8 +46,6 @@ public:
         this.head_y = y;
         this.len = start_len;
         this.dir = RIGHT;
-        head_color = [0, 60, 255];
-        tail_color = [150, 20, 255];
     };
 
     void advance() { //TODO: rename to calculate?
