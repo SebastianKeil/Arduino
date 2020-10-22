@@ -1,6 +1,6 @@
 # :snake: for Adafruit_NeoPixel
 * there is a :snake:
-* there are :tangerine: :tangerine: :tangerine:
+* there are :tangerine: :lemon: :cherries: :watermelon: :peach:
 * there is FUN :video_game: :sunglasses:
 
 
