@@ -1,7 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 
 #define PIN 6
-#define NUMPIXELS 450
+#define NUM_PIXELS 450
 
 #define UP_BUTTON 2
 #define DOWN_BUTTON 3
@@ -13,31 +13,35 @@
 #define RIGHT 2
 #define LEFT 3
 
+#define START_LEN = 4
+
+//TODO: delete fruit when new spawns == when it gets eaten
+//TODO: make snake bigger after eating fruit
+//Todo: Make sure the fruit can't spawn on the snake
+
 Adafruit_NeoPixel strip(NUMPIXELS, PIN, NEO_GBR);
 
-int head_x = 15;
-int head_y = 8;
-int tail[16];   //pixelnumb, no coords
-int len = 4;
-int fruit = 0;
+int head_x;
+int head_y;
+int tail[16];   //pixel number, not coordinates
+int len;
+int fruit;
+bool fruitOnField = false;
 int dir = RIGHT;
 
 void setup() {
-  Serial.begin(9600);
-  pinMode(UP_BUTTON, INPUT_PULLUP);
-  pinMode(DOWN_BUTTON, INPUT_PULLUP);
-  pinMode(RIGHT_BUTTON, INPUT_PULLUP);
-  pinMode(LEFT_BUTTON, INPUT_PULLUP);
+    Serial.begin(9600);
+    pinMode(UP_BUTTON, INPUT_PULLUP);
+    pinMode(DOWN_BUTTON, INPUT_PULLUP);
+    pinMode(RIGHT_BUTTON, INPUT_PULLUP);
+    pinMode(LEFT_BUTTON, INPUT_PULLUP);
  
-  strip.begin();
-  tail[0] = coordsToPixelNum(15, 7);
-  tail[1] = coordsToPixelNum(15, 6);
-  tail[2] = coordsToPixelNum(15, 5);
-  tail[3] = coordsToPixelNum(15, 4);
-  blackScreen();
-  strip.show();
-  randomSeed(analogRead(0));
-  fruit = (int) random(449);
+    strip.begin();
+    blackScreen();
+    strip.show();
+    resetGame();
+    strip.show();
+    randomSeed(analogRead(0));
 }
 
 void loop() {
@@ -50,9 +54,13 @@ void loop() {
   if (digitalRead(LEFT_BUTTON) && (dir == UP || dir == DOWN))
     dir = LEFT;
 
-  if (SnakeIsDead()) resetGame();
+  if (SnakeIsDead()) {
+      deleteSnake();
+      resetGame();
+  }
   advanceSnake();
-  displayAll();
+  setSnakePixel();
+  setFruitPixel();
   strip.show();
   delay(200);
 }
@@ -84,17 +92,16 @@ void advanceSnake() {
 }
 
 
-boolean SnakeIsDead() {
-
-  if (head_x < 0 || head_x > 29 || head_y < 0 || head_y > 14) {
+bool SnakeIsDead() {
+    //check if head left the screen
+    if (head_x < 0 || head_x > 29 || head_y < 0 || head_y > 14) {
     return true;
-  }
-  
-  for (int i = 0; i < len; i++){
-    if (tail[i] == coordsToPixelNum(head_x, head_y))return true;
-  }
-  
-  return false;
+    }
+    //check if snake hit itself
+    for (int i = 0; i < len; i++){
+        if (tail[i] == coordsToPixelNum(head_x, head_y)) return true;
+    }
+    return false;
 }
 
 void deleteSnake(){
@@ -105,34 +112,28 @@ void deleteSnake(){
 }
 
 void resetGame(){
-    deleteSnake();
     head_x = 15;
     head_y = 7;
-    tail[0] = coordsToPixelNum(15, 6);
-    tail[1] = coordsToPixelNum(15, 5);
-    tail[2] = coordsToPixelNum(15, 4);
-    tail[3] = coordsToPixelNum(15, 3);
-    len = 4;
+    len = START_LEN;
+    for(int i = 0; i < len; i++){
+        tail[i] = coordsToPixelNum(15, head_y-1-i);
+    }
     dir = RIGHT;
-    fruit = (int) random(449);
-    displayAll();
+    setSnakePixel();
     delay(200);
 }
 
-void displayAll() {
+void setSnakePixel() {
   strip.setPixelColor(coordsToPixelNum(head_x, head_y), 0, 60, 255);
-  for (int i = 0; i < len - 1; i++) {
+  for (int i = 0; i < len; i++) {
     strip.setPixelColor(tail[i], 150, 20*i, 255);
-    char message[16];
-    sprintf(message, "%d = %d\n", coordsToPixelNum(15, 6), tail[i]);
   }
-  
+  //TODO: why is the last tail segment set to black here?
   strip.setPixelColor(tail[len - 1], 0, 0, 0);
-  strip.setPixelColor(fruit, 255, 255, 0);
 }
 
 int coordsToPixelNum(int x, int y) {
-  int pixelNumber = 0;
+  int pixelNumber;
 
   if (y % 2 == 0) {
     pixelNumber = (y+1) * 30 - x -1;
@@ -143,11 +144,14 @@ int coordsToPixelNum(int x, int y) {
 }
 
 void blackScreen(){
-  for (int x = 0; x < 30;  x++) {
-    for (int y = 0; y < 15; y ++) {
-      strip.setPixelColor(coordsToPixelNum(x, y), 0, 0, 0);
-    }
-    strip.show();
-    
+  for (int i = 0; i < NUM_PIXELS;  i++) {
+      strip.setPixelColor(i, 0, 0, 0);
   }
+  strip.show();
+
+}
+
+void setFruitPixel() {
+    fruit = (int) random(NUM_PIXELS-1);
+    strip.setPixelColor(fruit, 255, 255, 0);
 }
