@@ -10,7 +10,7 @@ int left;
 int right;
 int up;
 int down;
-int directions[4];
+int directions[5];
 
 
 void setup() {
@@ -25,18 +25,17 @@ void loop() {
       //TODO Pause Menu?
       }
 
-    left = 0;
-    right = 0;
-    down = 0;
-    up = 0;
+    left = 1;
+    right = 1;
+    down = 1;
+    up = 1;
     
-    if(analogRead(0) < 400) left = map(analogRead(0), 400, 0, 1, 10);
-    if(analogRead(0) > 700) right = map(analogRead(0), 0, 700, 1, 10);
-    if(analogRead(1) < 400) down = map(analogRead(1), 400, 0, 1, 10);
-    if(analogRead(1) > 700) up = map(analogRead(1), 0, 700, 1, 10);
+    if(analogRead(0) < 400) left = map(analogRead(0), 400, 0, 2, 10);
+    if(analogRead(0) > 700) right = map(analogRead(0), 700, 1023, 2, 10);
+    if(analogRead(1) < 400) down = map(analogRead(1), 400, 0, 2, 10);
+    if(analogRead(1) > 700) up = map(analogRead(1), 700, 1023, 2, 10);
     
-    }
-
+    Serial.println("");
     Serial.print("left: ");
     Serial.println(left);
     Serial.print("right: ");
@@ -51,26 +50,51 @@ void loop() {
     directions[1] = right;
     directions[2] = down;
     directions[3] = up;
+    directions[4] = 0;
 
 
     Serial.print("directions["); 
     for(byte i = 0; i < 4; i++){
-      Serial.print(directions[i] + " "); 
-      Serial.println("]");
+      Serial.print(directions[i]); 
+      if(i < 3) Serial.print(", ");
     }
+    Serial.println("]");
 
     int dir_max = directions[0];
-    int dir_max_index = 0;
+    int dir_max_index = 4;
+    
     for(byte i = 1; i < 4; i++){
+      if(directions[0] > 1) dir_max_index = 0;
       if(directions[i] > dir_max){ 
         dir_max = directions[i];
         dir_max_index = i;
       }
     }
-    Serial.println("dir_max: " + dir_max);
-    Serial.println("dir_max_index: " + dir_max_index);
+    Serial.print("dir_max: ");
+    Serial.println(dir_max);
+    Serial.print("dir_max_index: ");
+    Serial.println(dir_max_index);
+    Serial.print("that means: ");
+    
+    switch (dir_max_index){
+      case 0:
+        Serial.println("left");
+        break;
+      case 1:
+        Serial.println("right");
+        break;
+      case 2:
+        Serial.println("down");
+        break;
+      case 3:
+        Serial.println("up");
+        break;
+      case 4:
+        Serial.println("no input");
+        break;
+    }
 
-    delay(500);
+    delay(1000);
 
     
 //  Serial.print("ANALOG_X: ");
