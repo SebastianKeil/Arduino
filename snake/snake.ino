@@ -5,20 +5,21 @@
 #define PIXEL_WIDTH 30  
 #define PIXEL_LENGTH 15
 
-#define UP_BUTTON 2
-#define DOWN_BUTTON 3
-#define RIGHT_BUTTON 4
-#define LEFT_BUTTON 5
+#define TRIGGER 3
+#define BUTTONS 4
+#define ANALOG_X 0
+#define ANALOG_y 1
 
-#define UP 0
-#define DOWN 1
-#define RIGHT 2
-#define LEFT 3
+#define NO_INPUTS 4
+#define UP 1
+#define DOWN 0
+#define RIGHT 3
+#define LEFT 2
 
 #define START_X 10
 #define START_Y 7
 #define START_LEN 4 //length of tail, without head
-#define MAX_TAIL_LENGTH 16
+#define MAX_TAIL_LENGTH 100
 
 //TODO: check inputs makes mistake, e.g. we can still go left, when already going right 
 //TODO: Make sure the fruit can't spawn on the snake
@@ -37,6 +38,9 @@ class Snake {
     int head_color[3] = {0, 60, 255};
     int tail_color[3] = {150, 20, 255};
 
+    int left, right, up, down;
+    int directions[5];
+
 public:
     Snake(int x, int y, int start_len){
         this->head_x = x;
@@ -46,7 +50,8 @@ public:
         for (int i=1; i<this->len; i++){
             this->tail[i] = this->coordsToPixelNum(this->head_x-(i+1), this->head_y);
         }
-        this->dir = RIGHT;
+        this->directions[4] = 0;
+        this->dir = 3;
     };
 
     void advance() {
@@ -64,7 +69,7 @@ public:
         this->tail[0] = this->headPixelNum();
 
         //check inputs and then update head coordinates
-        //this->checkInputs();
+        this->checkInputs();
         switch (this->dir) {
             case UP:
                 this->head_y -= 1;
@@ -116,22 +121,42 @@ public:
     }
 
     void setPixel(Adafruit_NeoPixel * strip) {
-        strip->setPixelColor(this->headPixelNum(), 0, 60, 255);
+        strip->setPixelColor(this->headPixelNum(), 20, 60, 0);
         for (int i = 0; i < this->len; i++) {
-            strip->setPixelColor(this->tail[i], 150, 20*i, 255);
+            strip->setPixelColor(this->tail[i], 150, 20*i, 100);
         }
         strip->setPixelColor(this->removedTailSegment, 0, 0, 0);
     }
 
     void checkInputs(){
-        if (digitalRead(UP_BUTTON) && (this->dir == LEFT || this->dir == RIGHT))
+        this->zeroDirections();
+        if(analogRead(0) < 400) left = map(analogRead(0), 400, 0, 2, 10);
+        if(analogRead(0) > 700) right = map(analogRead(0), 700, 1023, 2, 10);
+        if(analogRead(1) < 400) down = map(analogRead(1), 400, 0, 2, 10);
+        if(analogRead(1) > 700) up = map(analogRead(1), 700, 1023, 2, 10);
+        
+        directions[0] = left;
+        directions[1] = right;
+        directions[2] = down;
+        directions[3] = up;
+        
+        int dir_max = 0;
+        int dir_max_index = 4;
+        for(byte i = 0; i < 4; i++){
+          if(directions[i] > dir_max){ 
+            dir_max = directions[i];
+            dir_max_index = i;  
+          }
+        }
+
+        if((dir_max_index == UP) && (this->dir == LEFT || this->dir == RIGHT))
             this->dir = UP;
-        if (digitalRead(DOWN_BUTTON) && (this->dir == LEFT || this->dir == RIGHT))
+        if((dir_max_index == DOWN) && (this->dir == LEFT || this->dir == RIGHT))
             this->dir = DOWN;
-        if (digitalRead(RIGHT_BUTTON) && (this->dir == UP || this->dir == DOWN))
+        if((dir_max_index == RIGHT) && (this->dir == UP || this->dir == DOWN))
             this->dir = RIGHT;
-        if (digitalRead(LEFT_BUTTON) && (this->dir == UP || this->dir == DOWN))
-            this->dir = LEFT;
+        if((dir_max_index == LEFT) && (this->dir == UP || this->dir == DOWN))
+            this->dir = LEFT;  
     }
 
     int coordsToPixelNum(int x, int y) {
@@ -147,11 +172,18 @@ public:
     int headPixelNum() {
         return this->coordsToPixelNum(this->head_x, this->head_y);
     }
+
+    void zeroDirections(){
+      this->left = 0;
+      this->right = 0;
+      this->down = 0;
+      this->up = 0;
+    }
 };
 
 class Fruit {
     int position;
-    int color[3] = {255, 255, 0};
+    int color[3] = {0, 0, 200};
 
     //TODO: fruit ideas
     //ideas: move fruit und time fruit
@@ -202,11 +234,9 @@ void resetGame(Snake * snake, Fruit * fruit, Adafruit_NeoPixel * strip){
 
 void setup() {
     Serial.begin(9600);
-    pinMode(UP_BUTTON, INPUT_PULLUP);
-    pinMode(DOWN_BUTTON, INPUT_PULLUP);
-    pinMode(RIGHT_BUTTON, INPUT_PULLUP);
-    pinMode(LEFT_BUTTON, INPUT_PULLUP);
- 
+    pinMode(BUTTONS, INPUT_PULLUP);
+    pinMode(TRIGGER, INPUT_PULLUP);
+
     strip.begin();
     strip.clear();
     strip.show();
@@ -232,5 +262,5 @@ void loop() {
     }
 
     strip.show();
-    delay(200);
+    delay(70);
 }
