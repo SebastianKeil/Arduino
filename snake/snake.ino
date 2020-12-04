@@ -41,10 +41,12 @@ class Fruit {
 
 public:
     Fruit(){
+        //do while pixel is set
         this->position = (int) random(NUM_PIXELS-1);
     }
 
     void resetPosition(){
+        //do while pixel is set
         this->position = (int) random(NUM_PIXELS-1);
     }
 
