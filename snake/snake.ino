@@ -1,3 +1,4 @@
+#include <SD.h>
 #include <Adafruit_NeoPixel.h>
 #include "snake.h"
 

@@ -1,5 +1,6 @@
 #include <Led_Matrix.h>
 #include <Adafruit_NeoPixel.h> 
+#include <Vector.h>
 
 //macros for led matrix
 #define PIN 6
@@ -20,10 +21,20 @@
 #define ANALOG_X 0
 #define ANALOG_y 1
 
+//define for game
+#define START_MAGAZINE 5
+#define BULLETS_COUNT_MAX 10
+
+
+
 class PlayerShip{
+  
   public:
     int cockpit_x;
     int cockpit_y;
+
+    //stats
+    int bulletAmount;
 
     PlayerShip(int cockpit_x, int cockpit_y, LedMatrix* matrixPtr){
       this->cockpit_x = cockpit_x;
@@ -34,36 +45,41 @@ class PlayerShip{
     void fly(LedMatrix* matrixPtr){
       switch (matrixPtr->checkDirection()) {
         case LEFT:
-          this->cockpit_x--;
+          if (this->cockpit_x-1 > 0){
+            this->cockpit_x--;
+          }
           break;
         case RIGHT:
-          this->cockpit_x++;
+          if (this->cockpit_x+1 < WIDTH-1){
+            this->cockpit_x++;
+          }
           break;
         case UP:
-          this->cockpit_y--;
+          if (this->cockpit_y > 0){
+            this->cockpit_y--;
+          }
           break;
         case DOWN:
-          this->cockpit_y++;
+          if (this->cockpit_y+1 < HEIGHT-1){
+            this->cockpit_y++;
+          }
           break;
       }
       this->_cockpitPixelNum = matrixPtr->coordsToPixelNum(this->cockpit_x, this->cockpit_y);
     }
 
-    int check_bounds(int x, int y) {
-      return 0;
+
+    void draw(Adafruit_NeoPixel* stripPtr, LedMatrix* matrixPtr){
+      stripPtr->setPixelColor(this->_cockpitPixelNum, 250,250,0);
+      stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x, this->cockpit_y+1), 200,200,0);
+      stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x+1, this->cockpit_y+1), 200,200,0);
+      stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x-1, this->cockpit_y+1), 200,200,0);
     }
 
-    void draw(Adafruit_NeoPixel* stripPtr){
-      stripPtr->setPixelColor(this->_cockpitPixelNum, 200,200,0);
-    }
-
-    void undraw(Adafruit_NeoPixel* stripPtr){
-      
-    }
-
-    private:
-      int _cockpitPixelNum;
+  private:
+    int _cockpitPixelNum;
 };
+
 
 Adafruit_NeoPixel strip(NUM_PIXELS, PIN, NEO_GBR);
 LedMatrix matrix(NUM_PIXELS, WIDTH, HEIGHT);
@@ -72,15 +88,18 @@ PlayerShip ship(7, 25, &matrix);
 void setup() {  
   Serial.begin(9600);
   strip.begin();
-  ship.draw(&strip);
+  ship.draw(&strip, &matrix);
   strip.show(); 
 }
 
 void loop() {
-  strip.setPixelColor(matrix.coordsToPixelNum(10, 15), 200,0,0);
+  
   ship.fly(&matrix);
+  
   strip.clear();
-  ship.draw(&strip);
+  
+  ship.draw(&strip, &matrix);
+  
   strip.show();
   delay(50);
 }

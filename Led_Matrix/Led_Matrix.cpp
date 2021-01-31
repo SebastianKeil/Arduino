@@ -47,20 +47,6 @@ void LedMatrix::checkInputs(){
     if(analogRead(ANAL_X) > 750) this->_directions[RIGHT]= map(analogRead(0), 700, 1023, 2, 10);
     if(analogRead(ANAL_Y) > 750) this->_directions[UP]= map(analogRead(1), 700, 1023, 2, 10);
     if(analogRead(ANAL_Y) < 350) this->_directions[DOWN]= map(analogRead(1), 400, 0, 2, 10);
-
-    for (int i = 0; i < (sizeof(this->_directions)/sizeof(this->_directions[0])); i++)
-    {
-    	Serial.print(i); Serial.print(": ");
-    	Serial.println(this->_directions[i]);
-    	Serial.println();
-    	
-    }
-    Serial.print("x: ");
-	Serial.println(analogRead(ANAL_X));
-	Serial.print("y: ");
-	Serial.println(analogRead(ANAL_Y));
-    Serial.println();
-
 }
     
 
@@ -84,11 +70,8 @@ int LedMatrix::checkDirection(){
 
 void LedMatrix::checkButtons(){
 	for (int i = 0; i < (sizeof(this->_buttons)/sizeof(this->_buttons[0])); i++) {this->_buttons[i] = false; }
-	//for (int i = 0; i < sizeof(this->_buttons); i++) {Serial.println(this->_buttons[i]); }
 	if (digitalRead(TRIGGER)) this->_buttons[0] = true;
 	if (digitalRead(BUTTONS)) this->_buttons[1] = true;
-	//for (int i = 0; i < sizeof(this->_buttons); i++) {Serial.println(this->_buttons[i]); }
-
 }
 
 bool LedMatrix::isPressed(int button){
