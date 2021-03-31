@@ -5,9 +5,10 @@
 #include "Arduino.h"
 #include "Led_Matrix.h"
 
-class bullet{
+class Bullet{
 
   public:
+  Bullet(int x, int y, int dir_x, int dir_y);
   move();
   show();
 
