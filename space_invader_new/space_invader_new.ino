@@ -2,6 +2,8 @@
 #include <Adafruit_NeoPixel.h>
 #include <Vector.h>
 #include "Space_Ship.h"
+#include <Adafruit_NeoPixel.h> 
+#include "Bullet.h"
 
 //macros for led matrix
 #define PIN 6
@@ -39,13 +41,17 @@ void setup() {
 }
 
 void loop() {
-
-  playerShip.move(&matrix);
-
   strip.clear();
-
+  
+  playerShip.move(&matrix);
+  playerShip.shoot(&matrix);
   playerShip.show(&strip, &matrix);
 
+  for(int i = 0; i < playerShip.getBulletAmount(); i++){
+    playerShip.bullets[i]->move();
+    playerShip.bullets[i]->show(&strip, &matrix);
+  }
+
   strip.show();
-  delay(50);
+  //delay(50);
 }

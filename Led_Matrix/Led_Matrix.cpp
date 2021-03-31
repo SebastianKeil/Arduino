@@ -13,8 +13,10 @@
 #define DOWN 3
 
 //for buttons
-#define TRIGGER 3
-#define BUTTONS 4
+#define TRIGGER_PIN 3
+#define BUTTONS_PIN 4
+#define TRIGGER 0
+#define BUTTONS 1
 
 
 
@@ -25,7 +27,7 @@ LedMatrix::LedMatrix(int numPixels, int width, int height)
 	this->_width = width;
 	this->_height = height;
 	for (int i = 0; i < (sizeof(this->_buttons)/sizeof(this->_buttons[0])); i++) { this->_buttons[i] = false; }
-}	
+}
 
 int LedMatrix::coordsToPixelNum(int x, int y){
 	int pixelNum;
@@ -48,7 +50,7 @@ void LedMatrix::checkInputs(){
     if(analogRead(ANAL_Y) > 750) this->_directions[UP]= map(analogRead(1), 700, 1023, 2, 10);
     if(analogRead(ANAL_Y) < 350) this->_directions[DOWN]= map(analogRead(1), 400, 0, 2, 10);
 }
-    
+
 
 int LedMatrix::checkDirection(){
 
@@ -70,12 +72,12 @@ int LedMatrix::checkDirection(){
 
 void LedMatrix::checkButtons(){
 	for (int i = 0; i < (sizeof(this->_buttons)/sizeof(this->_buttons[0])); i++) {this->_buttons[i] = false; }
-	if (digitalRead(TRIGGER)) this->_buttons[0] = true;
-	if (digitalRead(BUTTONS)) this->_buttons[1] = true;
+	if (digitalRead(TRIGGER_PIN)) this->_buttons[TRIGGER] = true;
+	if (digitalRead(BUTTONS_PIN)) this->_buttons[BUTTONS] = true;
 }
 
 bool LedMatrix::isPressed(int button){
-	
+
 	this->checkButtons();
 
 	return this->_buttons[button];

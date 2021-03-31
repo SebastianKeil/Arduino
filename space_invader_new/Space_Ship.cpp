@@ -1,6 +1,10 @@
 #include "Space_Ship.h"
 #include "Arduino.h"
 
+//macros for led matrix
+#define WIDTH 15
+#define HEIGHT 30
+
 //for directions array
 #define LEFT 0
 #define RIGHT 1
@@ -8,13 +12,18 @@
 #define DOWN 3
 
 //for buttons
-#define TRIGGER 3
-#define BUTTONS 4
+#define TRIGGER_PIN 3
+#define BUTTONS_PIN 4
+#define TRIGGER 0
+#define BUTTONS 1
+
+#define MAX_BULLETS 10
 
 SpaceShip::SpaceShip(int cockpit_x, int cockpit_y, LedMatrix* matrixPtr){
   this->cockpit_x = cockpit_x;
   this->cockpit_y = cockpit_y;
   this->_cockpitPixelNum = matrixPtr->coordsToPixelNum(this->cockpit_x, this->cockpit_y);
+  this->_bulletAmount = 0;
 }
 
 void SpaceShip::move(LedMatrix* matrixPtr){
@@ -44,7 +53,11 @@ void SpaceShip::move(LedMatrix* matrixPtr){
 }
 
 void SpaceShip::shoot(LedMatrix* matrixPtr){
-  this -> bullets.push_back(new Bullet(this->cockpit_x, this->cockpit_y+1, 0, 1))
+  if(matrixPtr->isPressed(BUTTONS) && this->_bulletAmount < MAX_BULLETS){
+    //Bullet bullet(this->cockpit_x, this->cockpit_y-1, 0, -1);
+    this->bullets[_bulletAmount] = new Bullet(this->cockpit_x, this->cockpit_y-1, 0, -1);
+    this->_bulletAmount++;
+  }
 }
 
 void SpaceShip::show(Adafruit_NeoPixel* stripPtr, LedMatrix *matrixPtr){
@@ -52,4 +65,8 @@ void SpaceShip::show(Adafruit_NeoPixel* stripPtr, LedMatrix *matrixPtr){
   stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x, this->cockpit_y+1), 200,200,0);
   stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x+1, this->cockpit_y+1), 200,200,0);
   stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x-1, this->cockpit_y+1), 200,200,0);
+}
+
+int SpaceShip::getBulletAmount(){
+  return this->_bulletAmount;
 }

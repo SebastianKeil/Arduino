@@ -7,7 +7,7 @@
 #include <Adafruit_NeoPixel.h>
 #include <Led_Matrix.h>
 
-#define MAX_BULLETS 1000
+#define MAX_BULLETS 10
 
 class SpaceShip{
 
@@ -20,9 +20,11 @@ class SpaceShip{
     void move(LedMatrix* matrixPtr);
 		void shoot(LedMatrix* matrixPtr);
     void show(Adafruit_NeoPixel* stripPtr, LedMatrix *matrixPtr);
+    int getBulletAmount();
 
 	private:
     int _cockpitPixelNum;
+    int _bulletAmount;
 };
 
 #endif
