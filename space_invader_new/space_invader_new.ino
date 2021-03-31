@@ -1,6 +1,7 @@
 #include <Led_Matrix.h>
 #include <Adafruit_NeoPixel.h> 
 #include <Vector.h>
+#include <bullet.h>
 
 //macros for led matrix
 #define PIN 6
