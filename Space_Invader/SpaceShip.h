@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "BulletArray.h"
+#include "ShipArray.h"
 #include <Vector.h>
 #include <Adafruit_NeoPixel.h>
 #include <Led_Matrix.h>
@@ -14,19 +15,21 @@ class SpaceShip{
 	public:
     int cockpit_x;
     int cockpit_y;
-		BulletArray bullets;
-    int shape;
     int weapon;
    
-		SpaceShip(int cockpit_x, int cockpit_y, LedMatrix* matrixPtr, int shape=0, int weapon=0);
-    void move(LedMatrix* matrixPtr);
-		void shoot(LedMatrix* matrixPtr);
-    void show(Adafruit_NeoPixel* stripPtr, LedMatrix *matrixPtr);
+		SpaceShip(int cockpit_x, int cockpit_y, LedMatrix* matrixPtr, Adafruit_NeoPixel* stripPtr, int weapon=0);
+    void move(ShipArray* shipsPtr, LedMatrix* matrixPtr);
+    void hitByBullet(BulletArray* bulletsPtr);
+		void shoot(BulletArray* bulletsPtr, LedMatrix* matrixPtr);
+    void show(int alpha=1);
     int getBulletAmount();
 
-	private:
+	protected:
+    LedMatrix* matrixPtr;
+	  Adafruit_NeoPixel* stripPtr;
     int _cockpitPixelNum;
     int _bulletAmount;
+    unsigned long lastShotTime;
 };
 
 #endif

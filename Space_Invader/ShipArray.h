@@ -1,5 +1,5 @@
-#ifndef BulletArray_h
-#define BulletArray_h
+#ifndef ShipArray_h
+#define ShipArray_h
 
 #include "Arduino.h"
 #include "Led_Matrix.h"
@@ -9,14 +9,13 @@
 #define WIDTH 15
 #define HEIGHT 30
 
-class BulletArray{
+class ShipArray{
 
   public:
 
   int field[WIDTH][HEIGHT];
   
-  BulletArray();
-  void shift();
+  ShipArray();
   void show(Adafruit_NeoPixel* stripPtr, LedMatrix* matrixPtr);
 };
 

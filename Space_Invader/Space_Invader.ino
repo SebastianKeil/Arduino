@@ -2,8 +2,10 @@
 #include <Adafruit_NeoPixel.h>
 #include <Vector.h>
 #include "SpaceShip.h"
+#include "StickShip.h"
 #include <Adafruit_NeoPixel.h> 
 #include "BulletArray.h"
+#include "ShipArray.h"
 
 //macros for led matrix
 #define PIN 6
@@ -27,29 +29,42 @@
 //define for game
 #define START_MAGAZINE 5
 
-
+BulletArray bullets = BulletArray();
+ShipArray ships = ShipArray();
 
 Adafruit_NeoPixel strip(NUM_PIXELS, PIN, NEO_GBR);
 LedMatrix matrix(NUM_PIXELS, WIDTH, HEIGHT);
-SpaceShip playerShip(7, 25, &matrix);
+
+SpaceShip playerShip(7, 25, &matrix, &strip);
+StickShip enemyStick(0, 5, &matrix);
+
 
 void setup() {
   Serial.begin(9600);
   strip.begin();
-  playerShip.show(&strip, &matrix);
+  playerShip.show();
+  enemyStick.show(&strip, &matrix);
   strip.show();
-  SpaceShip enemyStick(7, 0, &matrix, 1, 0);
+  
 }
 
 void loop() {
   strip.clear();
-  
-  playerShip.move(&matrix);
-  playerShip.shoot(&matrix);
-  playerShip.show(&strip, &matrix);
-  playerShip.bullets.shift(-1);
-  playerShip.bullets.show(&strip, &matrix);
 
+  playerShip.hitByBullet(&bullets);
+  playerShip.move(&ships, &matrix);
+  playerShip.shoot(&bullets, &matrix);
+  playerShip.show();
+
+  
+  
+  enemyStick.move(&ships, &matrix);
+  enemyStick.shoot(&bullets, &matrix);
+  enemyStick.show(&strip, &matrix);
+
+  bullets.shift();
+  bullets.show(&strip, &matrix);
+  
   strip.show();
-  delay(10);
+  delay(50);
 }

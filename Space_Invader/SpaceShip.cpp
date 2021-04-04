@@ -25,6 +25,8 @@
 #define DEFAULT_SHAPE 0
 #define STICK_SHAPE 1
 
+#define PLAYERBULLET 1
+
 /*shapes  
  *        _            _
  *  0:  _|_|_   ->   _|_|_
@@ -67,16 +69,17 @@
   *     |_|_|_|   |_|_|_|        |_|_|_|
   */
 
-SpaceShip::SpaceShip(int cockpit_x, int cockpit_y, LedMatrix* matrixPtr, int shape=0, int weapon=0){
+SpaceShip::SpaceShip(int cockpit_x, int cockpit_y, LedMatrix* matrixPtr, Adafruit_NeoPixel* stripPtr, int weapon=0){
   this->cockpit_x = cockpit_x;
   this->cockpit_y = cockpit_y;
+  this->matrixPtr = matrixPtr;
   this->_cockpitPixelNum = matrixPtr->coordsToPixelNum(this->cockpit_x, this->cockpit_y);
-  this->bullets = BulletArray();
-  this->shape = shape;
+  this->stripPtr = stripPtr;
   this->weapon = weapon;
+  this->lastShotTime = millis();
 }
 
-void SpaceShip::move(LedMatrix* matrixPtr){
+void SpaceShip::move(ShipArray* shipsPtr, LedMatrix* matrixPtr){
   switch (matrixPtr->checkDirection()) {
     case LEFT:
       if (this->cockpit_x-1 > 0){
@@ -126,25 +129,43 @@ void SpaceShip::move(LedMatrix* matrixPtr){
   this->_cockpitPixelNum = matrixPtr->coordsToPixelNum(this->cockpit_x, this->cockpit_y);
 }
 
-void SpaceShip::shoot(LedMatrix* matrixPtr){
-  if(matrixPtr->isPressed(BUTTONS)){
-    this->bullets.field[this->cockpit_x][this->cockpit_y] = 1;
+void SpaceShip::hitByBullet(BulletArray* bulletsPtr){
+  if(bulletsPtr->field[this->cockpit_x][this->cockpit_y-1] == 2){
+    this->stripPtr->clear();
+    this->show(0.5);
+    this->stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x, this->cockpit_y), 200,200,0);
+    this->stripPtr->show();
+    delay(1000);
+    asm volatile ("jmp 0");
+  }else if(bulletsPtr->field[this->cockpit_x-1][this->cockpit_y] == 2){
+    this->stripPtr->clear();
+    this->show(0.5);
+    this->stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x-1, this->cockpit_y), 200,200,0);
+    this->stripPtr->show();
+    delay(1000);
+    asm volatile ("jmp 0");
+  } else if(bulletsPtr->field[this->cockpit_x+1][this->cockpit_y] == 2){
+    this->stripPtr->clear();
+    this->show(0.5);
+    this->stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x+1, this->cockpit_y), 200,200,0);
+    this->stripPtr->show();
+    delay(1000);
+    asm volatile ("jmp 0");
   }
 }
 
-void SpaceShip::show(Adafruit_NeoPixel* stripPtr, LedMatrix *matrixPtr){
-  switch(this->shape){
-    case DEFAULT_SHAPE:
-      stripPtr->setPixelColor(this->_cockpitPixelNum, 250,250,0);
-      stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x, this->cockpit_y+1), 200,200,0);
-      stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x+1, this->cockpit_y+1), 200,200,0);
-      stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x-1, this->cockpit_y+1), 200,200,0);
-      break;
-    case STICK_SHAPE:
-      stripPtr->setPixelColor(this->_cockpitPixelNum, 0,0,250);
-      stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x, this->cockpit_y+1), 0,0,200);
-      break;
+void SpaceShip::shoot(BulletArray* bulletsPtr, LedMatrix* matrixPtr){
+  if(matrixPtr->isPressed(TRIGGER) && millis()-this->lastShotTime > 300){
+    bulletsPtr->field[this->cockpit_x][this->cockpit_y] = PLAYERBULLET;
+    this->lastShotTime = millis();
   }
+}
+
+void SpaceShip::show(int alpha){
+   this->stripPtr->setPixelColor(this->_cockpitPixelNum, 250*alpha,250*alpha,0);
+   this->stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x, this->cockpit_y+1), 200*alpha,200*alpha,0);
+   this->stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x+1, this->cockpit_y+1), 200*alpha,200*alpha,0);
+   this->stripPtr->setPixelColor(matrixPtr->coordsToPixelNum(this->cockpit_x-1, this->cockpit_y+1), 200*alpha,200*alpha,0);
 }
 
 int SpaceShip::getBulletAmount(){
