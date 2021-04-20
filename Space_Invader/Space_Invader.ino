@@ -14,6 +14,7 @@
 #define HEIGHT 30
 
 
+
 //for directions array
 #define LEFT 0
 #define RIGHT 1
@@ -45,7 +46,8 @@ void setup() {
   playerShip.show();
   enemyStick.show(&strip, &matrix);
   strip.show();
-  
+
+    
 }
 
 void loop() {
@@ -57,7 +59,7 @@ void loop() {
   playerShip.show();
 
   
-  
+  //TODO: for all enemys of enemy[?]
   enemyStick.move(&ships, &matrix);
   enemyStick.shoot(&bullets, &matrix);
   enemyStick.show(&strip, &matrix);
@@ -66,5 +68,5 @@ void loop() {
   bullets.show(&strip, &matrix);
   
   strip.show();
-  delay(50);
+  delay(map(analogRead(2), 0, 1023, 20, 200));
 }
