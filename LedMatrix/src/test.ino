@@ -1,8 +1,19 @@
-    /////////////////////////////////////////////////////////////////
-   //              Arduino SD Card Tutorial     v1.00             //
-  //       Get the latest version of the code here:              //
- //         http://educ8s.tv/arduino-sd-card-tutorial           //
-/////////////////////////////////////////////////////////////////
+#include <Arduino.h>
+#include <Adafruit_NeoPixel.h>
+#include <LedMatrix.h>
+
+
+//macros for led matrix
+#define PIN 6
+#define NUM_PIXELS 450
+#define WIDTH 15
+#define HEIGHT 30
+
+Adafruit_NeoPixel strip(NUM_PIXELS, PIN, NEO_GBR);
+LedMatrix matrix(NUM_PIXELS, WIDTH, HEIGHT, &strip);
+
+
+//sd test
 #include <SD.h>
 #include <SPI.h>
 
@@ -14,9 +25,11 @@ const int chipSelect = 53;
 
 File root;
 
-void setup() {
 
- // Open serial communications and wait for port to open:
+void setup() {
+  matrix.begin();
+
+  // Open serial communications and wait for port to open:
 
   Serial.begin(9600);
 
@@ -39,7 +52,6 @@ void setup() {
     Serial.println("Note: press reset or reopen this serial monitor after fixing your issue!");
 
     while (true);
-
   }
 
   Serial.println("initialization done.");
@@ -51,10 +63,11 @@ void setup() {
   Serial.println("done!");
 }
 
-void loop() {
 
-  // nothing happens after setup finishes.
+void loop() {
+  
 }
+
 
 void printDirectory(File dir, int numTabs) {
 
@@ -99,8 +112,7 @@ void printDirectory(File dir, int numTabs) {
   }
 }
 
-void initializeSD()
-{
+void initializeSD(){
   Serial.print("Initializing SD card...");
 
   if (!SD.begin(53)) {
@@ -114,8 +126,7 @@ void initializeSD()
   Serial.println("initialization done.");
 }
 
-int createFile(char filename[])
-{
+int createFile(char filename[]){
   file = SD.open(filename, FILE_WRITE);
 
   if (file)
@@ -129,8 +140,7 @@ int createFile(char filename[])
   }
 }
 
-int writeToFile(char text[])
-{
+int writeToFile(char text[]){
   if (file)
   {
     file.println(text);
@@ -144,8 +154,7 @@ int writeToFile(char text[])
   }
 }
 
-void closeFile()
-{
+void closeFile(){
   if (file)
   {
     file.close();
@@ -153,8 +162,7 @@ void closeFile()
   }
 }
 
-int openFile(char filename[])
-{
+int openFile(char filename[]){
   file = SD.open(filename);
   if (file)
   {
@@ -167,8 +175,7 @@ int openFile(char filename[])
   }
 }
 
-String readLine()
-{
+String readLine(){
   String received = "";
   char ch;
   while (file.available())
