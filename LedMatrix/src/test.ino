@@ -17,17 +17,24 @@ LedMatrix matrix(NUM_PIXELS, WIDTH, HEIGHT, &strip);
 #include <SD.h>
 #include <SPI.h>
 
-const int CS_PIN = 53;
+const int CS_PIN = 53; // chip select
+
+File root;
 
 File file;
 
-const int chipSelect = 53;
-
-File root;
+File scores;
 
 
 void setup() {
   matrix.begin();
+  matrix.clear();
+  matrix.drawWord("GG", 2, 5);
+  matrix.drawNumber("66", 2, 12);
+  matrix.show();
+  matrix.clear();
+  matrix.show();
+  delay(250);
 
   // Open serial communications and wait for port to open:
 
@@ -35,37 +42,52 @@ void setup() {
 
   // wait for Serial Monitor to connect. Needed for native USB port boards only:
 
-  while (!Serial);
-
-  Serial.print("Initializing SD card...");
-
-  if (!SD.begin(chipSelect)) {
-
-    Serial.println("initialization failed. Things to check:");
-
-    Serial.println("1. is a card inserted?");
-
-    Serial.println("2. is your wiring correct?");
-
-    Serial.println("3. did you change the chipSelect pin to match your shield or module?");
-
-    Serial.println("Note: press reset or reopen this serial monitor after fixing your issue!");
-
-    while (true);
-  }
-
-  Serial.println("initialization done.");
-
-  root = SD.open("/");
-
-  printDirectory(root, 0);
-
-  Serial.println("done!");
+  // while (!Serial);
+  //
+  // Serial.print("Initializing SD card...");
+  //
+  // if (!SD.begin(CS_PIN)) {
+  //
+  //   Serial.println("initialization failed. Things to check:");
+  //
+  //   Serial.println("1. is a card inserted?");
+  //
+  //   Serial.println("2. is your wiring correct?");
+  //
+  //   Serial.println("3. did you change the chipSelect pin to match your shield or module?");
+  //
+  //   Serial.println("Note: press reset or reopen this serial monitor after fixing your issue!");
+  //
+  //   while (true);
+  // }
+  //
+  // Serial.println("initialization done.");
+  //
+  // root = SD.open("/");
+  //
+  // printDirectory(root, 0);
+  //
+  // root.close();
+  //
+  // Serial.println("done!");
+  //
+  // Serial.println("\nOpen scores file...");
+  // scores = SD.open("/SNAKE.TXT", FILE_WRITE);
+  //
+  // //writeToFile("GLN    66", scores);
+  //
+  // readLine(scores);
+  //
+  // Serial.println("\nClosing scores file...");
+  // scores.close();
 }
 
 
 void loop() {
-  
+  String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  for(unsigned int i=0; i<alphabet.length(); i++){
+    matrix.drawLetter(alphabet[i], int 5, int 12);
+  }
 }
 
 
@@ -115,7 +137,7 @@ void printDirectory(File dir, int numTabs) {
 void initializeSD(){
   Serial.print("Initializing SD card...");
 
-  if (!SD.begin(53)) {
+  if (!SD.begin(CS_PIN)) {
 
     Serial.println("initialization failed!");
 
@@ -129,18 +151,16 @@ void initializeSD(){
 int createFile(char filename[]){
   file = SD.open(filename, FILE_WRITE);
 
-  if (file)
-  {
+  if (file) {
     Serial.println("File created successfully.");
     return 1;
-  } else
-  {
+  } else {
     Serial.println("Error while creating file.");
     return 0;
   }
 }
 
-int writeToFile(char text[]){
+int writeToFile(char text[], File file){
   if (file)
   {
     file.println(text);
@@ -154,7 +174,7 @@ int writeToFile(char text[]){
   }
 }
 
-void closeFile(){
+void closeFile(File file){
   if (file)
   {
     file.close();
@@ -164,29 +184,23 @@ void closeFile(){
 
 int openFile(char filename[]){
   file = SD.open(filename);
-  if (file)
-  {
+  if (file) {
     Serial.println("File opened with success!");
     return 1;
-  } else
-  {
+  } else {
     Serial.println("Error opening file...");
     return 0;
   }
 }
 
-String readLine(){
+String readLine(File file){
   String received = "";
   char ch;
-  while (file.available())
-  {
+  while (file.available()){
     ch = file.read();
-    if (ch == '\n')
-    {
+    if (ch == '\n'){
       return String(received);
-    }
-    else
-    {
+    } else {
       received += ch;
     }
   }

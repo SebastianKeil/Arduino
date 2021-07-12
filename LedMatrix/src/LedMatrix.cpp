@@ -109,6 +109,10 @@ bool LedMatrix::isPressed(int button){
 }
 
 
+// ****************************************
+// FUNCTIONS FOR DRAWING NUMBERS AND DIGITS
+// ****************************************
+
 void LedMatrix::drawNumber(String number, int x, int y, int alpha){
 	for (unsigned int i = 0; i < number.length(); i++){
 		int digit = number[i] - '0';
@@ -119,37 +123,37 @@ void LedMatrix::drawNumber(String number, int x, int y, int alpha){
 
 void LedMatrix::drawDigit(int digit, int x, int y, int alpha){
 	switch (digit) {
-						case 0:
-								this->_draw0(x, y, alpha);
-								break;
-						case 1:
-								this->_draw1(x, y, alpha);
-								break;
-						case 2:
-								this->_draw2(x, y, alpha);
-								break;
-						case 3:
-								this->_draw3(x, y, alpha);
-								break;
-						case 4:
-								this->_draw4(x, y, alpha);
-								break;
-						case 5:
-								this->_draw5(x, y, alpha);
-								break;
-						case 6:
-								this->_draw6(x, y, alpha);
-								break;
-						case 7:
-								this->_draw7(x, y, alpha);
-								break;
-						case 8:
-								this->_draw8(x, y, alpha);
-								break;
-						case 9:
-								this->_draw9(x, y, alpha);
-								break;
-				}
+			case 0:
+					this->_draw0(x, y, alpha);
+					break;
+			case 1:
+					this->_draw1(x, y, alpha);
+					break;
+			case 2:
+					this->_draw2(x, y, alpha);
+					break;
+			case 3:
+					this->_draw3(x, y, alpha);
+					break;
+			case 4:
+					this->_draw4(x, y, alpha);
+					break;
+			case 5:
+					this->_draw5(x, y, alpha);
+					break;
+			case 6:
+					this->_draw6(x, y, alpha);
+					break;
+			case 7:
+					this->_draw7(x, y, alpha);
+					break;
+			case 8:
+					this->_draw8(x, y, alpha);
+					break;
+			case 9:
+					this->_draw9(x, y, alpha);
+					break;
+	}
 }
 
 
@@ -293,4 +297,106 @@ void LedMatrix::_draw9(int x, int y, int alpha){
 	this->stripPtr->setPixelColor(this->coordsToPixelNum(x, y+4), 250*alpha,250*alpha,0);
 	this->stripPtr->setPixelColor(this->coordsToPixelNum(x+1, y+4), 250*alpha,250*alpha,0);
 	this->stripPtr->setPixelColor(this->coordsToPixelNum(x+2, y+4), 250*alpha,250*alpha,0);
+}
+
+
+// **************************************
+// FUNCTIONS FOR DRAWING WORDS AND LETERS
+// **************************************
+
+void LedMatrix::drawWord(String word, int x, int y, int alpha){
+	for (unsigned int i = 0; i < word.length(); i++){
+		this->drawLetter(word[i], x+6*i, y, alpha);
+	}
+}
+
+void LedMatrix::drawLetter(char letter, int x, int y, int alpha){
+	switch (letter) {
+		case 'A':
+			this->_drawChar(this->_A, x, y, alpha);
+			break;
+		case 'B':
+			this->_drawChar(this->_B, x, y, alpha);
+			break;
+		case 'C':
+			this->_drawChar(this->_C, x, y, alpha);
+			break;
+		case 'D':
+			this->_drawChar(this->_D, x, y, alpha);
+			break;
+		case 'E':
+			this->_drawChar(this->_E, x, y, alpha);
+			break;
+		case 'F':
+			this->_drawChar(this->_F, x, y, alpha);
+			break;
+		case 'G':
+			this->_drawChar(this->_G, x, y, alpha);
+			break;
+		case 'H':
+			this->_drawChar(this->_H, x, y, alpha);
+			break;
+		case 'I':
+			this->_drawChar(this->_I, x, y, alpha);
+			break;
+		case 'J':
+			this->_drawChar(this->_J, x, y, alpha);
+			break;
+		case 'K':
+			this->_drawChar(this->_K, x, y, alpha);
+			break;
+		case 'L':
+			this->_drawChar(this->_L, x, y, alpha);
+			break;
+		case 'M':
+			this->_drawChar(this->_M, x, y, alpha);
+			break;
+		case 'N':
+			this->_drawChar(this->_N, x, y, alpha);
+			break;
+		case 'O':
+			this->_drawChar(this->_O, x, y, alpha);
+			break;
+		case 'P':
+			this->_drawChar(this->_P, x, y, alpha);
+			break;
+		case 'Q':
+			this->_drawChar(this->_Q, x, y, alpha);
+			break;
+		case 'R':
+			this->_drawChar(this->_R, x, y, alpha);
+			break;
+		case 'S':
+			this->_drawChar(this->_S, x, y, alpha);
+			break;
+		case 'T':
+			this->_drawChar(this->_T, x, y, alpha);
+			break;
+		case 'U':
+			this->_drawChar(this->_U, x, y, alpha);
+			break;
+		case 'V':
+			this->_drawChar(this->_V, x, y, alpha);
+			break;
+		case 'W':
+			this->_drawChar(this->_W, x, y, alpha);
+			break;
+		case 'X':
+			this->_drawChar(this->_X, x, y, alpha);
+			break;
+		case 'Y':
+			this->_drawChar(this->_Y, x, y, alpha);
+			break;
+		case 'Z':
+			this->_drawChar(this->_Z, x, y, alpha);
+			break;
+	}
+}
+
+void LedMatrix::_drawChar(bool (&charArray)[5][5], int x, int y, int alpha){
+	for(size_t i = 0; i < 5; i++){
+		for(size_t j = 0; j < 5; j++){
+			if(charArray[i][j]) this->stripPtr->setPixelColor(this->coordsToPixelNum(x+j, y+i), 250*alpha,250*alpha,0);
+		}
+	}
 }
